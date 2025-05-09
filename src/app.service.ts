@@ -3,14 +3,34 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { DataSource } from 'typeorm';
 import { User } from './entity/user.entity';
+import { IdCardEntity } from './entity/IdCard.entity';
 
 @Injectable()
 export class AppService {
   private readonly logger = new Logger(AppService.name);
   @Inject('DATA_SOURCE') private readonly dataSource: DataSource;
 
-  async getHello(): Promise<User[]> {
-    return this.dataSource.getRepository(User).find();
+  async getHello(): Promise<any[]> {
+    try {
+      const user = new User();
+      user.username = '12212';
+      user.password = '123456';
+      user.age = 13;
+
+      const idCard = new IdCardEntity();
+      idCard.cardName = '121212';
+      idCard.user = user;
+
+      await this.dataSource.getRepository(IdCardEntity).save(idCard);
+    } catch (err) {
+      console.log(err);
+    }
+
+    return this.dataSource.manager.find(IdCardEntity, {
+      relations: {
+        user: true,
+      },
+    });
   }
 
   uploadChunk(file: Express.Multer.File, name: string) {
@@ -50,16 +70,16 @@ export class AppService {
       const chunkSize = fs.statSync(filePath).size;
       const stream = fs.createReadStream(filePath);
 
-      stream.pipe(
-        fs.createWriteStream(targetPath, { start: startPos }),
-      ).on('finish', () => {
-        count++;
-        if (count === files.length) {
-          fs.rm(chunkDir, { recursive: true }, () => {
-            this.logger.log(`Merged and cleaned up: ${chunkDir}`);
-          });
-        }
-      });
+      stream
+        .pipe(fs.createWriteStream(targetPath, { start: startPos }))
+        .on('finish', () => {
+          count++;
+          if (count === files.length) {
+            fs.rm(chunkDir, { recursive: true }, () => {
+              this.logger.log(`Merged and cleaned up: ${chunkDir}`);
+            });
+          }
+        });
 
       startPos += chunkSize;
     }

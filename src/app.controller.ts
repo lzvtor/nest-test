@@ -13,8 +13,7 @@ import { User } from './entity/user.entity';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {
-  }
+  constructor(private readonly appService: AppService) {}
 
   @Get()
   getHello(): Promise<User[]> {

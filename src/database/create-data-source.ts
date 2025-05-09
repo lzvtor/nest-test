@@ -15,7 +15,8 @@ export function createDataSource(): DataSource {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     synchronize: process.env.TYPEORM_SYNC === 'true',
-    logging: true,
+    logging: false,
     entities: [path.join(__dirname, '../**/*.entity.{ts,js}')],
+    connectorPackage: 'mysql2',
   });
 }

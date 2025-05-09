@@ -19,5 +19,4 @@ import { createDataSource } from './create-data-source';
   ],
   exports: ['DATA_SOURCE'],
 })
-export class DatabaseModule {
-}
+export class DatabaseModule {}
