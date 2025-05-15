@@ -4,13 +4,16 @@ import * as path from 'path';
 import { DataSource } from 'typeorm';
 import { User } from './entity/user.entity';
 import { IdCardEntity } from './entity/IdCard.entity';
+import { RedisManageService } from './redis-manage/redis-manage.service';
 
 @Injectable()
 export class AppService {
   private readonly logger = new Logger(AppService.name);
   @Inject('DATA_SOURCE') private readonly dataSource: DataSource;
 
-  async getHello(): Promise<any[]> {
+  constructor(private readonly redisManageService: RedisManageService) {}
+
+  async getHello(): Promise<User[]> {
     try {
       const user = new User();
       user.username = '12212';
@@ -26,11 +29,12 @@ export class AppService {
       console.log(err);
     }
 
-    return this.dataSource.manager.find(IdCardEntity, {
-      relations: {
-        user: true,
-      },
-    });
+    return this.dataSource.manager.find(User);
+  }
+
+  async getRedis() {
+    const data = await this.redisManageService.get('*');
+    console.log(data);
   }
 
   uploadChunk(file: Express.Multer.File, name: string) {

@@ -17,6 +17,7 @@ export class AppController {
 
   @Get()
   getHello(): Promise<User[]> {
+    void this.appService.getRedis();
     return this.appService.getHello();
   }
 
